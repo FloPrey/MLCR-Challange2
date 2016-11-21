@@ -1,4 +1,5 @@
 import pandas as pd
+from pickler import pickler
 
 raw_df = pd.read_hdf('dataset/data.h5', 'raw') # type: pd.DataFrame
 
