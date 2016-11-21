@@ -1,8 +1,7 @@
 import pandas as pd
 from pickler import pickler
 
-raw_df = pd.read_hdf('dataset/data.h5', 'raw') # type: pd.DataFrame
-# raw_df.to_csv("dataset/data.csv")
+raw_df = pickler("raw_df", pd.read_hdf, "dataset/data.h5", "raw")
 
 def get_quantile(data, q):
     """Takes series of values and returns quantile limit as well as the mean of the values above the quantile.
