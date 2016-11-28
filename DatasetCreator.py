@@ -71,7 +71,14 @@ def createInputData():
     m = feature_df.Test_time.apply(lambda x: x.minute)
     feature_df['time_of_day'] = h + (m / 60.0)
     
-    return feature_df
+    return selectFeature(feature_df)
+
+'''Add further feature selection'''
+def selectFeature(feature_df):
+    
+    subFeatureSet = feature_df.loc[(feature_df.Subject == 1), ['positive_mean', 'time_of_day']]
+    
+    return subFeatureSet
     
 def createOutputData():
     
