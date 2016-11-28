@@ -31,7 +31,7 @@ def compute_features(test_df, verbose=False):
     q90_lim, q90_mean = get_quantile(positive_data.response_time, 0.90)
     q95_lim, q95_mean = get_quantile(positive_data.response_time, 0.95)
     features = pd.Series({'Test_time': test_time,
-                          'Subject': test_df.subject.iloc[0],
+                          'Participant_ID': test_df.subject.iloc[0],
                           'Test_nr': test_df.test.iloc[0],
                           'n_total': n,
                           'n_positive': n_positive,
@@ -48,7 +48,42 @@ def compute_features(test_df, verbose=False):
                           'q95_mean': q95_mean})
     if verbose:
         print(features)
+        
     return features
+
+def computeBasicFeatures(raw_df):
+    
+    feature_df = pd.DataFrame()  # not declared in sample code
+    for subject_id, subject_df in raw_df.groupby(raw_df.subject):
+        for test_id, test_df in subject_df.groupby(subject_df.test):
+            feature_df = feature_df.append(compute_features(test_df), ignore_index=True)
+    feature_df.reset_index(inplace=True, drop=True)
+    
+    # Compute the time of day as a float
+    h = feature_df.Test_time.apply(lambda x: x.hour)
+    m = feature_df.Test_time.apply(lambda x: x.minute)
+    feature_df['time_as_float'] = h + (m / 60.0)
+    
+    return feature_df
+
+def joinFeaturesAndDiary(feature_df):
+    
+    newTimeList = list()
+    timeList = feature_df["Test_time"].tolist()
+    
+    for item in timeList:
+    
+        rounded_qtr_hour = 15*(item.minute // 15)
+        
+        newTimeList.append(str(item.replace(minute=rounded_qtr_hour, second=0)))
+        
+    feature_df["Time"] = newTimeList
+    
+    diary_df = pd.read_csv('dataset/modifiedLabels.csv')
+    
+    inputData = pd.merge(feature_df, diary_df, on=['Participant_ID','Time'])
+    
+    return inputData
 
 
 def createInputData():
@@ -59,25 +94,18 @@ def createInputData():
     raw_df.loc[raw_df['subject'] == 7, 'subject'] = 6
     raw_df.loc[raw_df['subject'] == 8, 'subject'] = 7
     
-    feature_df = pd.DataFrame()  # not declared in sample code
-    for subject_id, subject_df in raw_df.groupby(raw_df.subject):
-        for test_id, test_df in subject_df.groupby(subject_df.test):
-            feature_df = feature_df.append(compute_features(test_df), ignore_index=True)
-    feature_df.reset_index(inplace=True, drop=True)
+    feature_df = computeBasicFeatures(raw_df)
     
+    # joins feature set with diary entries (needs Participant_ID and timestamp to join)
+    inputData = joinFeaturesAndDiary(feature_df)
     
-    # Compute the time of day as a float
-    h = feature_df.Test_time.apply(lambda x: x.hour)
-    m = feature_df.Test_time.apply(lambda x: x.minute)
-    feature_df['time_of_day'] = h + (m / 60.0)
-    
-    return selectFeature(feature_df)
+    return selectBestFeatures(inputData)
 
 '''Add further feature selection'''
-def selectFeature(feature_df):
+def selectBestFeatures(feature_df):
     
-    subFeatureSet = feature_df.loc[(feature_df.Subject == 1), ['positive_mean', 'time_of_day']]
-    
+    subFeatureSet = feature_df.loc[(feature_df.Participant_ID == 1), ['Participant_ID', 'Time', 'positive_mean', 'day', 'Caffeine', 'Food']]
+ 
     return subFeatureSet
     
 def createOutputData():
