@@ -6,6 +6,8 @@ Created on Nov 26, 2016
 from sklearn.datasets import load_boston
 from sklearn.model_selection import cross_val_score
 from sklearn.tree import DecisionTreeRegressor
-boston = load_boston()
-regressor = DecisionTreeRegressor(random_state=0)
-cross_val_score(regressor, boston.data, boston.target, cv=10)
+
+def trainModel(inputData, labels):
+    
+    regressor = DecisionTreeRegressor(random_state=0)
+    cross_val_score(regressor, inputData, labels, cv=10)
