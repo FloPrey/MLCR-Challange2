@@ -10,7 +10,7 @@ inputData = dc.createInputData()
 
 outputData = dc.createOutputData()
 
-print (outputData)
+print (inputData)
 
 #do regression
-#models.train(inputData, outputData)
+#models.trainModel(inputData, outputData)
