@@ -8,9 +8,10 @@ import Challenge2.RegressionModels as models
 
 dataset = dc.createDataSet()
 
-print(dataset)
+inputData, outputLabel = dc.createInputAndOutputDataset(dataset)
 
-#inputData, outputData = dc.createInputAndOutputDataset(dataset)
+print(inputData)
+print(outputLabel)
 
 #do regression
-#models.trainModel(inputData, outputData)
+models.trainCartModel(inputData, outputLabel)
