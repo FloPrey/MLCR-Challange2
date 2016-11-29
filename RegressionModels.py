@@ -14,10 +14,17 @@ def trainCartModel(inputData, labels):
     
     print("CART - Regression Model trained with score: ")
     print (score)
+    print("CART - Regression Model trained with predict: ")
+    score = cross_val_predict(regressor, inputData, labels, cv=2)
+    print(score)
 
 def AdaBoostTryOuts(inputData, labels):
     regressor = AdaboostR(base_estimator=DecisionTreeRegressor(random_state=0), n_estimators=300)
     score = cross_val_score(regressor, inputData, labels, cv=2)
     print("ADABoost - Regression Model trained with score: ")
     print (score)
+    print("ADABoost - Regression Model trained with predict: ")
+    score = cross_val_predict(regressor, inputData, labels, cv=2)
+    print(score)
+
 
