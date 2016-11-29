@@ -6,11 +6,11 @@ Created on Nov 28, 2016
 import Challenge2.DatasetCreator as dc
 import Challenge2.RegressionModels as models
 
-inputData = dc.createInputData()
+dataset = dc.createDataSet()
 
-outputData = dc.createOutputData()
+print(dataset)
 
-print (inputData)
+#inputData, outputData = dc.createInputAndOutputDataset(dataset)
 
 #do regression
 #models.trainModel(inputData, outputData)
