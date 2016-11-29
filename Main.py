@@ -3,8 +3,8 @@ Created on Nov 28, 2016
 
 @author: tobi
 '''
-import Challenge2.DatasetCreator as dc
-import Challenge2.RegressionModels as models
+import DatasetCreator as dc
+import RegressionModels as models
 
 dataset = dc.createDataSet()
 
@@ -15,3 +15,4 @@ print(outputLabel)
 
 #do regression
 models.trainCartModel(inputData, outputLabel)
+models.AdaBoostTryOuts(inputData, outputLabel)

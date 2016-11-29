@@ -5,9 +5,9 @@ Created on Nov 29, 2016
 '''
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
-import Challenge2.DatasetCreator as dc
-import pylab
 
+import DatasetCreator as dc
+import pylab
     
 def do3DPlot(inputData, outputLabel):
 
