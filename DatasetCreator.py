@@ -66,7 +66,7 @@ def computeBasicFeatures(raw_df):
     
     return feature_df
 
-def joinFeaturesAndDiary(feature_df):
+def joinFeaturesAndDiary(feature_df, diary_df):
     
     newTimeList = list()
     timeList = feature_df["Test_time"].tolist()
@@ -79,36 +79,47 @@ def joinFeaturesAndDiary(feature_df):
         
     feature_df["Time"] = newTimeList
     
-    diary_df = pd.read_csv('dataset/modifiedLabels.csv')
-    
     inputData = pd.merge(feature_df, diary_df, on=['Participant_ID','Time'])
     
     return inputData
 
-
-def createInputData():
+'''Creates the complete Dataset containing all features, diary-labels and output label.'''
+def createDataSet():
     
+    # load rawData
     raw_df = pd.read_hdf("dataset/data.h5", "raw")
+    # load enhanced diary
+    diary_df = pd.read_csv('dataset/modifiedLabels.csv')
     
     # change participant numbers as there are only 7
     raw_df.loc[raw_df['subject'] == 7, 'subject'] = 6
     raw_df.loc[raw_df['subject'] == 8, 'subject'] = 7
     
+    # compute basicFeatures
     feature_df = computeBasicFeatures(raw_df)
     
-    # joins feature set with diary entries (needs Participant_ID and timestamp to join)
-    inputData = joinFeaturesAndDiary(feature_df)
+    # join feature set with diary entries (needs Participant_ID and timestamp to join)
+    inputDataSet = joinFeaturesAndDiary(feature_df, diary_df)
     
-    return selectBestFeatures(inputData)
-
-'''Add further feature selection'''
-def selectBestFeatures(feature_df):
+    # add the output labels (msf) to the dataset
+    completeDataset_df = joinOutputLabel(inputDataSet)
     
-    subFeatureSet = feature_df.loc[(feature_df.Participant_ID == 1), ['Participant_ID', 'Time', 'positive_mean', 'day', 'Caffeine', 'Food']]
- 
-    return subFeatureSet
+    completeDataset_df.to_csv("dataset/completeDataset")
     
-def createOutputData():
+    return completeDataset_df
+    
+    
+'''Method to reduce complete Dataset into an input and output set with specific features.'''    
+def createInputAndOutputDataset(completeDataset_df):
+    
+    subFeatureSet = completeDataset_df.loc[(completeDataset_df.Participant_ID == 1), ['Participant_ID', 'time_as_float', 'positive_mean', 'day', 'Caffeine', 'Food']]
+    
+    bestMeanValueSet = subFeatureSet.loc[subFeatureSet['positive_mean'].idxmin()]
+    
+    return bestMeanValueSet
+    
+'''Helper method to calculate the msf values for the entire dataset.'''
+def createMSFMatrix():
     
     # load already enhanced label-set (added day column)
     diary = pd.read_csv('dataset/modifiedLabels.csv')
@@ -144,3 +155,18 @@ def createOutputData():
             msfMatrix[participant-1][day-1] = msfFloat
     
     return msfMatrix
+
+
+'''Method to join the input dataset and the msf-label.'''
+def joinOutputLabel(inputData):
+    
+    msfMatrix = createMSFMatrix()
+    inputAndOutput_df = inputData.copy()
+    msfColumn = list()
+    
+    for i in range(0, len(inputData)):
+        msfColumn.append(msfMatrix[int(inputData.iloc[i]['Participant_ID'])-1][int(inputData.iloc[i]['day'])-1])
+    
+    inputAndOutput_df['msf'] = msfColumn
+    
+    return inputAndOutput_df
