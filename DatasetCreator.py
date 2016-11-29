@@ -112,11 +112,37 @@ def createDataSet():
 '''Method to reduce complete Dataset into an input and output set with specific features.'''    
 def createInputAndOutputDataset(completeDataset_df):
     
-    subFeatureSet = completeDataset_df.loc[(completeDataset_df.Participant_ID == 1), ['Participant_ID', 'time_as_float', 'positive_mean', 'day', 'Caffeine', 'Food']]
+    numberOfParticipants = int(completeDataset_df["Participant_ID"].max())
+    numberOfDays = len(set(completeDataset_df["day"].tolist()))
     
-    bestMeanValueSet = subFeatureSet.loc[subFeatureSet['positive_mean'].idxmin()]
+    features = ['Participant_ID', 'positive_mean', 'time_as_float', 'day', 'msf']
     
-    return bestMeanValueSet
+    inputOutput_df = pd.DataFrame(columns = features)
+    
+    for participant in range(numberOfParticipants):
+        
+        participant = participant+1
+        
+        # Get all all sleep moments of the current participant
+        participantData = completeDataset_df.loc[(completeDataset_df.Participant_ID == participant)]
+        
+        for day in range(participantData["day"].max()):
+            
+            day = day+1
+            
+            if (any(participantData.day == day)):
+    
+                participantsDayData = participantData.loc[(participantData.day == day)]
+        
+                bestMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['Participant_ID', 'positive_mean', 'time_as_float', 'day', 'msf']].tolist()
+                
+                inputOutput_df.loc[len(inputOutput_df)]=bestMeanOfDaySet
+
+
+    outputLabel = inputOutput_df["msf"].tolist()            
+    inputOutput_df.drop('msf', axis=1, inplace=True)
+    
+    return inputOutput_df, outputLabel
     
 '''Helper method to calculate the msf values for the entire dataset.'''
 def createMSFMatrix():
