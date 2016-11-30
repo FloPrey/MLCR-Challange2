@@ -8,7 +8,7 @@ import Challenge2.RegressionModels as models
 
 dataset = dc.createDataSet()
 
-inputData, outputLabel = dc.createInputAndOutputDataset(dataset)
+inputData, outputLabel = dc.createInputAndOutputDataset(dataset, False)
 
 print(inputData)
 print(outputLabel)
