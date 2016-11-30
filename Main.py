@@ -11,6 +11,7 @@ dataset = dc.createDataSet()
 inputData, outputLabel = dc.createInputAndOutputDataset(dataset)
 
 print(inputData)
+print("--")
 print(outputLabel)
 
 #do regression
