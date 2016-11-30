@@ -6,6 +6,9 @@ Created on Nov 26, 2016
 from sklearn.datasets import load_boston
 from sklearn.model_selection import cross_val_score
 from sklearn.tree import DecisionTreeRegressor
+from sklearn.metrics import mean_squared_error
+from math import sqrt
+
 
 def trainCartModel(inputData, labels):
     
@@ -14,3 +17,8 @@ def trainCartModel(inputData, labels):
     
     print("CART - Regression Model trained with score: ")
     print (score)
+    
+
+def errorCalculation(prediction, groundTruth):
+
+    rmse = sqrt(mean_squared_error(groundTruth, prediction))
