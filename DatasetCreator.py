@@ -110,12 +110,15 @@ def createDataSet():
     
     
 '''Method to reduce complete Dataset into an input and output set with specific features.'''    
-def createInputAndOutputDataset(completeDataset_df):
+def createInputAndOutputDataset(completeDataset_df, simpleFeatures):
     
     numberOfParticipants = int(completeDataset_df["Participant_ID"].max())
     numberOfDays = len(set(completeDataset_df["day"].tolist()))
     
-    features = ['Participant_ID', 'positive_mean', 'time_as_float', 'day', 'msf']
+    if (simpleFeatures):
+        features = ['Participant_ID', 'day', 'msf', 'best_mean', 'time_of_best']
+    else :
+        features = ['Participant_ID', 'day', 'msf', 'best_mean', 'time_of_best', 'worst_mean', 'time_of_worst']
     
     inputOutput_df = pd.DataFrame(columns = features)
     
@@ -134,9 +137,17 @@ def createInputAndOutputDataset(completeDataset_df):
     
                 participantsDayData = participantData.loc[(participantData.day == day)]
         
-                bestMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['Participant_ID', 'positive_mean', 'time_as_float', 'day', 'msf']].tolist()
-                
-                inputOutput_df.loc[len(inputOutput_df)]=bestMeanOfDaySet
+                if (len(participantsDayData)>0):
+                    
+                    bestMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['Participant_ID', 'day', 'msf', 'positive_mean', 'time_as_float']].tolist()
+                    
+                    if (not simpleFeatures):   
+                            
+                        worstMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmax()), ['positive_mean', 'time_as_float']].tolist()
+                    
+                        bestMeanOfDaySet.extend(worstMeanOfDaySet) 
+                    
+                    inputOutput_df.loc[len(inputOutput_df)]=bestMeanOfDaySet
 
 
     outputLabel = inputOutput_df["msf"].tolist()            
