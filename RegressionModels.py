@@ -19,7 +19,8 @@ def trainCartModel(inputData, labels):
     print("CART - Regression Model trained with score: ")
     print (score)
 
-def AdaBoostTryOuts(inputData, labels):
+
+def trainAdaBoost(inputData, labels):
     regressor = AdaboostR(base_estimator=DecisionTreeRegressor(random_state=0), n_estimators=300)
     score = cross_val_score(regressor, inputData, labels, cv=2, scoring="neg_mean_squared_error")
     print("ADABoost - Regression Model trained with score: ")
@@ -31,7 +32,20 @@ def AdaBoostTryOuts(inputData, labels):
     print(score)
 
 
+def trainSVR(features, target, kernel, C, degree=None):
+    from sklearn.svm import SVR
+    svr_mdl = SVR(kernel=kernel, C=C)
+    svr_mdl.fit(features, target)
+
+    if (degree == None):
+        svr_mdl = SVR(kernel=kernel, C=C)
+    else:
+        svr_mdl = SVR(kernel=kernel, C=C, degree=degree)
+
+    score = cross_val_score(svr_mdl, features, target, cv=2)
+
+    print("SVR ", kernel, " - trained with score: ")
+    print (score)
 
 def errorCalculation(prediction, groundTruth):
-
     rmse = sqrt(mean_squared_error(groundTruth, prediction))
