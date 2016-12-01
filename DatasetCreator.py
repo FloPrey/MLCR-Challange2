@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta    
+from random import randint
 
 def get_quantile(data, q):
     """Takes series of values and returns quantile limit as well as the mean of the values above the quantile.
@@ -110,12 +111,14 @@ def createDataSet():
     
     
 '''Method to reduce complete Dataset into an input and output set with specific features.'''    
-def createInputAndOutputDataset(completeDataset_df):
+def inputOutputDataWorkAndFreeDays(completeDataset_df, simpleFeatures):
     
     numberOfParticipants = int(completeDataset_df["Participant_ID"].max())
-    numberOfDays = len(set(completeDataset_df["day"].tolist()))
     
-    features = ['Participant_ID', 'positive_mean', 'time_as_float', 'day', 'msf']
+    if (simpleFeatures):
+        features = ['Participant_ID', 'day', 'msf', 'best_mean', 'time_of_best']
+    else :
+        features = ['Participant_ID', 'day', 'msf', 'best_mean', 'time_of_best', 'worst_mean', 'time_of_worst']
     
     inputOutput_df = pd.DataFrame(columns = features)
     
@@ -134,16 +137,136 @@ def createInputAndOutputDataset(completeDataset_df):
     
                 participantsDayData = participantData.loc[(participantData.day == day)]
         
-                bestMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['Participant_ID', 'positive_mean', 'time_as_float', 'day', 'msf']].tolist()
-                
-                inputOutput_df.loc[len(inputOutput_df)]=bestMeanOfDaySet
+                if (len(participantsDayData)>0):
+                    
+                    bestMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['Participant_ID', 'day', 'msf', 'positive_mean', 'time_as_float']].tolist()
+                    
+                    if (not simpleFeatures):   
+                            
+                        worstMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmax()), ['positive_mean', 'time_as_float']].tolist()
+                    
+                        bestMeanOfDaySet.extend(worstMeanOfDaySet) 
+                    
+                    inputOutput_df.loc[len(inputOutput_df)]=bestMeanOfDaySet
 
 
     outputLabel = inputOutput_df["msf"].tolist()            
     inputOutput_df.drop('msf', axis=1, inplace=True)
     
     return inputOutput_df, outputLabel
+
+def inputOutputDataWorkDays(completeDataset_df, simpleFeatures):
     
+    numberOfParticipants = int(completeDataset_df["Participant_ID"].max())
+    
+    if (simpleFeatures):
+        features = ['Participant_ID', 'day', 'msf', 'best_mean', 'time_of_best']
+    else :
+        features = ['Participant_ID', 'day', 'msf', 'best_mean', 'time_of_best', 'worst_mean', 'time_of_worst']
+    
+    inputOutput_df = pd.DataFrame(columns = features)
+    
+    for participant in range(numberOfParticipants):
+        
+        participant = participant+1
+        
+        # Get all all sleep moments of the current participant
+        participantData = completeDataset_df.loc[(completeDataset_df.Participant_ID == participant)]
+        
+        for day in range(participantData["day"].max()):
+            
+            day = day+1
+            
+            if (any(participantData.day == day)):
+    
+                participantsDayData = participantData.loc[(participantData.day == day) & (participantData.Workday == 1)]
+        
+                if (len(participantsDayData)>0):
+                    
+                    bestMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['Participant_ID', 'day', 'msf', 'positive_mean', 'time_as_float']].tolist()
+                    
+                    if (not simpleFeatures):   
+                            
+                        worstMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmax()), ['positive_mean', 'time_as_float']].tolist()
+                    
+                        bestMeanOfDaySet.extend(worstMeanOfDaySet) 
+                    
+                    inputOutput_df.loc[len(inputOutput_df)]=bestMeanOfDaySet
+
+    return splitDataset(inputOutput_df)
+
+def inputOutputDataFreeDays(completeDataset_df, simpleFeatures):
+    
+    numberOfParticipants = int(completeDataset_df["Participant_ID"].max())
+    
+    if (simpleFeatures):
+        features = ['Participant_ID', 'day', 'msf', 'best_mean', 'time_of_best']
+    else :
+        features = ['Participant_ID', 'day', 'msf', 'best_mean', 'time_of_best', 'worst_mean', 'time_of_worst']
+    
+    inputOutput_df = pd.DataFrame(columns = features)
+    
+    for participant in range(numberOfParticipants):
+        
+        participant = participant+1
+        
+        # Get all all sleep moments of the current participant
+        participantData = completeDataset_df.loc[(completeDataset_df.Participant_ID == participant)]
+        
+        for day in range(participantData["day"].max()):
+            
+            day = day+1
+            
+            if (any(participantData.day == day)):
+    
+                participantsDayData = participantData.loc[(participantData.day == day) & (participantData.Workday == 0)]
+        
+                if (len(participantsDayData)>0):
+                    
+                    bestMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['Participant_ID', 'day', 'msf', 'positive_mean', 'time_as_float']].tolist()
+                    
+                    if (not simpleFeatures):   
+                            
+                        worstMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmax()), ['positive_mean', 'time_as_float']].tolist()
+                    
+                        bestMeanOfDaySet.extend(worstMeanOfDaySet) 
+                    
+                    inputOutput_df.loc[len(inputOutput_df)]=bestMeanOfDaySet
+    
+    return splitDataset(inputOutput_df)
+
+def splitDataset(inputOutput_df):
+    
+    numberOfParticipants = int(inputOutput_df["Participant_ID"].max())
+    
+    train_x = inputOutput_df.copy()
+    
+    test_x = pd.DataFrame(columns = list(inputOutput_df.columns.values))
+    
+    for participant in range(numberOfParticipants):
+        
+        participant = participant+1
+        
+        # Get all all sleep moments of the current participant
+        participantData = train_x.loc[(train_x.Participant_ID == participant)]
+            
+        if (len(participantData) > 1):
+                
+            testDataIndex = randint(0, len(participantData)-1)
+            
+            test_x.loc[len(test_x)]=participantData.iloc[testDataIndex]
+            
+            train_x.drop(train_x.index[testDataIndex])   
+    
+    
+    train_y = train_x["msf"].tolist() 
+    train_x.drop('msf', axis=1, inplace=True)
+    
+    test_y = test_x["msf"].tolist()
+    test_x.drop('msf', axis=1, inplace=True)
+    
+    return train_x, train_y, test_x, test_y
+
 '''Helper method to calculate the msf values for the entire dataset.'''
 def createMSFMatrix():
     
