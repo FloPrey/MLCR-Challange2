@@ -378,8 +378,8 @@ def splitByParticipant(train_x, train_y, test_x, test_y):
 
         participantTrainFeatures.append(train_x[:][startRow:endRow])
         participantTestFeatures.append(test_x[:][startRow:endRow])
-        participantTrainTargets.append(test_x[:][startRow:endRow])
-        participantTestTargets.append(test_x[:][startRow:endRow])
+        participantTrainTargets.append(train_y[:][startRow:endRow])
+        participantTestTargets.append(test_y[:][startRow:endRow])
         startRow = endRow
 
     return participantTrainFeatures, participantTrainTargets, participantTestFeatures, participantTestTargets
