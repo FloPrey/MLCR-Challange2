@@ -5,6 +5,7 @@ Created on Nov 26, 2016
 '''
 from sklearn.datasets import load_boston
 from sklearn.model_selection import cross_val_score, cross_val_predict
+from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import AdaBoostRegressor as AdaboostR
 from sklearn.metrics import mean_squared_error
@@ -32,20 +33,20 @@ def trainAdaBoost(inputData, labels):
     print(score)
 
 
-def trainSVR(features, target, kernel, C, degree=None):
-    from sklearn.svm import SVR
+def errorCalculation(prediction, groundTruth):
+    rmse = sqrt(mean_squared_error(groundTruth, prediction))
+
+#kernel = linear, rbf, polynomial(degree needed)
+def trainSVR(features, target, kernel, C=1e3, degree=None):
     svr_mdl = SVR(kernel=kernel, C=C)
     svr_mdl.fit(features, target)
 
     if (degree == None):
         svr_mdl = SVR(kernel=kernel, C=C)
+
     else:
         svr_mdl = SVR(kernel=kernel, C=C, degree=degree)
 
     score = cross_val_score(svr_mdl, features, target, cv=2)
-
     print("SVR ", kernel, " - trained with score: ")
     print (score)
-
-def errorCalculation(prediction, groundTruth):
-    rmse = sqrt(mean_squared_error(groundTruth, prediction))
