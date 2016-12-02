@@ -31,3 +31,4 @@ print (testW_y)
 #do regression
 #models.trainCartModel(inputWorkDays, outputWorkDays)
 #models.trainAdaBoostModel(inputWorkDays, outputWorkDays)
+#models.trainSVR(inputWorkDays, outputWorkDays, kernel = 'rbf')

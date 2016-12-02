@@ -38,8 +38,6 @@ def errorCalculation(prediction, groundTruth):
 
 #kernel = linear, rbf, polynomial(degree needed)
 def trainSVR(features, target, kernel, C=1e3, degree=None):
-    svr_mdl = SVR(kernel=kernel, C=C)
-    svr_mdl.fit(features, target)
 
     if (degree == None):
         svr_mdl = SVR(kernel=kernel, C=C)
@@ -47,6 +45,7 @@ def trainSVR(features, target, kernel, C=1e3, degree=None):
     else:
         svr_mdl = SVR(kernel=kernel, C=C, degree=degree)
 
+    svr_mdl.fit(features, target)
     score = cross_val_score(svr_mdl, features, target, cv=2)
     print("SVR ", kernel, " - trained with score: ")
     print (score)
