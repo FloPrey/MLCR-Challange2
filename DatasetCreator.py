@@ -259,7 +259,7 @@ def createMSF_SCMatrix(middle=avg_from_timedelta_tuplelist):
         print(participant, ":", [(str(x), str(y)) for (x, y) in raw_free], " - ",
               [(str(x), str(y)) for (x, y) in raw_work])
         sd_f, so_f = middle(raw_free)
-        sd_w, so_w = middle(raw_free)
+        sd_w, so_w = middle(raw_work)
         sd_week = (sd_f * len(raw_free) + sd_w * len(raw_work)) / (len(raw_free) + len(raw_work))
         msf = so_f + (sd_f / 2)
         msf_sc = msf
