@@ -116,9 +116,9 @@ def inputOutputDataWorkAndFreeDays(completeDataset_df, simpleFeatures):
     numberOfParticipants = int(completeDataset_df["Participant_ID"].max())
     
     if (simpleFeatures):
-        features = ['Participant_ID', 'day', 'msf', 'best_mean', 'time_of_best']
+        features = ['Participant_ID', 'day', 'msf', 'MSFSC', 'best_mean', 'time_of_best']
     else :
-        features = ['Participant_ID', 'day', 'msf', 'best_mean', 'time_of_best', 'worst_mean', 'time_of_worst']
+        features = ['Participant_ID', 'day', 'msf', 'MSFSC', 'best_mean', 'time_of_best', 'worst_mean', 'time_of_worst']
     
     inputOutput_df = pd.DataFrame(columns = features)
     
@@ -139,7 +139,7 @@ def inputOutputDataWorkAndFreeDays(completeDataset_df, simpleFeatures):
         
                 if (len(participantsDayData)>0):
                     
-                    bestMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['Participant_ID', 'day', 'msf', 'positive_mean', 'time_as_float']].tolist()
+                    bestMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['Participant_ID', 'day', 'msf', 'MSFSC', 'positive_mean', 'time_as_float']].tolist()
                     
                     if (not simpleFeatures):   
                             
