@@ -109,52 +109,6 @@ def createDataSet():
     
     return completeDataset_df
     
-    
-'''Method to reduce complete Dataset into an input and output set with specific features.'''    
-def inputOutputDataWorkAndFreeDays(completeDataset_df, simpleFeatures):
-    
-    numberOfParticipants = int(completeDataset_df["Participant_ID"].max())
-    
-    if (simpleFeatures):
-        features = ['Participant_ID', 'day', 'msf', 'MSFSC', 'best_mean', 'time_of_best']
-    else :
-        features = ['Participant_ID', 'day', 'msf', 'MSFSC', 'best_mean', 'time_of_best', 'worst_mean', 'time_of_worst']
-    
-    inputOutput_df = pd.DataFrame(columns = features)
-    
-    for participant in range(numberOfParticipants):
-        
-        participant = participant+1
-        
-        # Get all all sleep moments of the current participant
-        participantData = completeDataset_df.loc[(completeDataset_df.Participant_ID == participant)]
-        
-        for day in range(participantData["day"].max()):
-            
-            day = day+1
-            
-            if (any(participantData.day == day)):
-    
-                participantsDayData = participantData.loc[(participantData.day == day)]
-        
-                if (len(participantsDayData)>0):
-                    
-                    bestMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['Participant_ID', 'day', 'msf', 'MSFSC', 'positive_mean', 'time_as_float']].tolist()
-                    
-                    if (not simpleFeatures):   
-                            
-                        worstMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmax()), ['positive_mean', 'time_as_float']].tolist()
-                    
-                        bestMeanOfDaySet.extend(worstMeanOfDaySet) 
-                    
-                    inputOutput_df.loc[len(inputOutput_df)]=bestMeanOfDaySet
-
-
-    outputLabel = inputOutput_df["msf"].tolist()            
-    inputOutput_df.drop('msf', axis=1, inplace=True)
-    
-    return inputOutput_df, outputLabel
-
 def inputOutputDataWorkDays(completeDataset_df, simpleFeatures):
     
     numberOfParticipants = int(completeDataset_df["Participant_ID"].max())
@@ -193,7 +147,7 @@ def inputOutputDataWorkDays(completeDataset_df, simpleFeatures):
                     
                     inputOutput_df.loc[len(inputOutput_df)]=bestMeanOfDaySet
 
-    return splitDataset(inputOutput_df)
+    return inputOutput_df
 
 def inputOutputDataFreeDays(completeDataset_df, simpleFeatures):
     
@@ -233,7 +187,15 @@ def inputOutputDataFreeDays(completeDataset_df, simpleFeatures):
                     
                     inputOutput_df.loc[len(inputOutput_df)]=bestMeanOfDaySet
     
-    return splitDataset(inputOutput_df)
+    return inputOutput_df
+
+def splitLabels(inputOutput_df):
+    
+    outputData = inputOutput_df["msf"].tolist()
+    inputData = inputOutput_df.copy()
+    inputData.drop('msf', axis=1, inplace=True)
+    
+    return inputData, outputData
 
 def splitDataset(inputOutput_df):
     
@@ -367,8 +329,6 @@ def createMSF_SCMatrix(middle=avg_from_timedelta_tuplelist):
                 raw_free.append(tuple)
 
         # avg calculation
-        print(participant, ":", [(str(x), str(y)) for (x, y) in raw_free], " - ",
-              [(str(x), str(y)) for (x, y) in raw_work])
         sd_f, so_f = middle(raw_free)
         sd_w, so_w = middle(raw_work)
         sd_week = (sd_f * len(raw_free) + sd_w * len(raw_work)) / (len(raw_free) + len(raw_work))
@@ -384,7 +344,6 @@ def createMSF_SCMatrix(middle=avg_from_timedelta_tuplelist):
     index = msf_persist["Participant_ID"]
     del (msf_persist["Participant_ID"])
     msfMatrix = pd.DataFrame(msf_persist, index=index)
-    print(msfMatrix)
     return msfMatrix
 
 
