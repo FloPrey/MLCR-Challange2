@@ -160,9 +160,9 @@ def inputOutputDataWorkDays(completeDataset_df, simpleFeatures):
     numberOfParticipants = int(completeDataset_df["Participant_ID"].max())
     
     if (simpleFeatures):
-        features = ['Participant_ID', 'day', 'msf', 'best_mean', 'time_of_best']
+        features = ['Participant_ID', 'day', 'msf', 'MSFSC', 'best_mean', 'time_of_best']
     else :
-        features = ['Participant_ID', 'day', 'msf', 'best_mean', 'time_of_best', 'worst_mean', 'time_of_worst']
+        features = ['Participant_ID', 'day', 'msf', 'MSFSC', 'best_mean', 'time_of_best', 'worst_mean', 'time_of_worst']
     
     inputOutput_df = pd.DataFrame(columns = features)
     
@@ -183,7 +183,7 @@ def inputOutputDataWorkDays(completeDataset_df, simpleFeatures):
         
                 if (len(participantsDayData)>0):
                     
-                    bestMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['Participant_ID', 'day', 'msf', 'positive_mean', 'time_as_float']].tolist()
+                    bestMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['Participant_ID', 'day', 'msf', 'MSFSC', 'positive_mean', 'time_as_float']].tolist()
                     
                     if (not simpleFeatures):   
                             
@@ -200,9 +200,9 @@ def inputOutputDataFreeDays(completeDataset_df, simpleFeatures):
     numberOfParticipants = int(completeDataset_df["Participant_ID"].max())
     
     if (simpleFeatures):
-        features = ['Participant_ID', 'day', 'msf', 'best_mean', 'time_of_best']
+        features = ['Participant_ID', 'day', 'msf', 'MSFSC', 'best_mean', 'time_of_best']
     else :
-        features = ['Participant_ID', 'day', 'msf', 'best_mean', 'time_of_best', 'worst_mean', 'time_of_worst']
+        features = ['Participant_ID', 'day', 'msf', 'MSFSC', 'best_mean', 'time_of_best', 'worst_mean', 'time_of_worst']
     
     inputOutput_df = pd.DataFrame(columns = features)
     
@@ -223,7 +223,7 @@ def inputOutputDataFreeDays(completeDataset_df, simpleFeatures):
         
                 if (len(participantsDayData)>0):
                     
-                    bestMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['Participant_ID', 'day', 'msf', 'positive_mean', 'time_as_float']].tolist()
+                    bestMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['Participant_ID', 'day', 'msf', 'MSFSC', 'positive_mean', 'time_as_float']].tolist()
                     
                     if (not simpleFeatures):   
                             
@@ -304,22 +304,6 @@ def createMSFMatrix():
             msfMatrix[participant-1][day-1] = msfFloat
     
     return msfMatrix
-
-
-'''Method to join the input dataset and the msf-label.'''
-def joinOutputLabel(inputData):
-    
-    msfMatrix = createMSFMatrix()
-    inputAndOutput_df = inputData.copy()
-    msfColumn = list()
-    
-    for i in range(0, len(inputData)):
-        msfColumn.append(msfMatrix[int(inputData.iloc[i]['Participant_ID'])-1][int(inputData.iloc[i]['day'])-1])
-    
-    inputAndOutput_df['msf'] = msfColumn
-    
-    return inputAndOutput_df
-
 
 def avg_from_timedelta_tuplelist(raw):
     """
@@ -417,7 +401,3 @@ def joinOutputLabel(inputData):
     msfsc = createMSF_SCMatrix()
     inputAndOutput_df = inputAndOutput_df.join(msfsc, on='Participant_ID')
     return inputAndOutput_df
-
-
-if __name__ == "__main__":
-    createMSF_SCMatrix()
