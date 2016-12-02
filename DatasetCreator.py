@@ -85,8 +85,6 @@ def joinFeaturesAndDiary(feature_df, diary_df):
 
 
 '''Creates the complete Dataset containing all features, diary-labels and output label.'''
-
-
 def createDataSet():
     # load rawData
     raw_df = pd.read_hdf("dataset/data.h5", "raw")
@@ -112,8 +110,6 @@ def createDataSet():
 
 
 '''Method to reduce complete Dataset into an input and output set with specific features.'''
-
-
 def createInputAndOutputDataset(completeDataset_df, simpleFeatures):
     numberOfParticipants = int(completeDataset_df["Participant_ID"].max())
     numberOfDays = len(set(completeDataset_df["day"].tolist()))
@@ -162,8 +158,6 @@ def createInputAndOutputDataset(completeDataset_df, simpleFeatures):
 
 
 '''Helper method to calculate the msf values for the entire dataset.'''
-
-
 def createMSFMatrix():
     # load already enhanced label-set (added day column)
     diary = pd.read_csv('dataset/modifiedLabels.csv')
@@ -201,12 +195,24 @@ def createMSFMatrix():
 
 
 def avg_from_timedelta_tuplelist(raw):
+    """
+    Converts list of tuples (a,b) to 2 separate lists (list of a, list of b). Picks for each list the
+    arithmetical middle.
+    :param raw: list of tuples
+    :return:
+    """
     sd = sum([z for (y, z) in raw], timedelta(0)) / float(len(raw)) if len(raw) else timedelta(0)
     so = sum([y for (y, z) in raw], timedelta(0)) / float(len(raw)) if len(raw) else timedelta(0)
     return sd, so
 
 
 def median_from_timedelta_tuplelist(raw):
+    """
+    Converts list of tuples (a,b) to 2 separate lists (list of a, list of b). Picks for each list the
+    median.
+    :param raw: list of tuples.
+    :return:
+    """
     if len(raw) == 0:
         return timedelta(0), timedelta(0)
     else:
@@ -284,6 +290,7 @@ def joinOutputLabel(inputData):
     msfsc = createMSF_SCMatrix()
     inputAndOutput_df = inputAndOutput_df.join(msfsc, on='Participant_ID')
     return inputAndOutput_df
+
 
 if __name__ == "__main__":
     createMSF_SCMatrix()
