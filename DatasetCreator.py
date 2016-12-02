@@ -401,3 +401,26 @@ def joinOutputLabel(inputData):
     msfsc = createMSF_SCMatrix()
     inputAndOutput_df = inputAndOutput_df.join(msfsc, on='Participant_ID')
     return inputAndOutput_df
+
+def splitByParticipant(train_x, train_y, test_x, test_y):
+    amountIds = len(set(train_x['Participant_ID']))
+    totalIds = len(train_x['Participant_ID'])
+    participantTrainFeatures = []
+    participantTrainTargets = []
+    participantTestFeatures = []
+    participantTestTargets = []
+    startRow = 0
+    endRow = 0
+    for i in range(amountIds):
+        print (i)
+        currentID = train_x['Participant_ID'][startRow]
+        while (endRow<totalIds) and (currentID == train_x['Participant_ID'][endRow]):
+            endRow = endRow + 1
+
+        participantTrainFeatures.append(train_x[:][startRow:endRow])
+        participantTestFeatures.append(test_x[:][startRow:endRow])
+        participantTrainTargets.append(test_x[:][startRow:endRow])
+        participantTestTargets.append(test_x[:][startRow:endRow])
+        startRow = endRow
+
+    return participantTrainFeatures, participantTrainTargets, participantTestFeatures, participantTestTargets
