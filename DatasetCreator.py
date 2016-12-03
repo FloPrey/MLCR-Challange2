@@ -109,14 +109,11 @@ def createDataSet():
 
     return completeDataset_df
 
-def inputOutputDataWorkDays(completeDataset_df, simpleFeatures):
+def inputOutputDataWorkDays(completeDataset_df):
 
     numberOfParticipants = int(completeDataset_df["Participant_ID"].max())
 
-    if (simpleFeatures):
-        features = ['Participant_ID', 'day', 'msf', 'MSFSC', 'best_mean', 'time_of_best']
-    else :
-        features = ['Participant_ID', 'day', 'msf', 'MSFSC', 'best_mean', 'time_of_best', 'worst_mean', 'time_of_worst']
+    features = ['Participant_ID', 'day', 'msf', 'MSFSC','earliest_test', 'earliest_time', 'best_mean', 'time_of_best', 'latest_test', 'latest_time']
 
     inputOutput_df = pd.DataFrame(columns = features)
 
@@ -136,27 +133,25 @@ def inputOutputDataWorkDays(completeDataset_df, simpleFeatures):
                 participantsDayData = participantData.loc[(participantData.day == day) & (participantData.Workday == 1)]
 
                 if (len(participantsDayData)>0):
+                    
+                    earliestTest = participantsDayData.loc[(participantsDayData['Test_nr'].idxmin()), ['Participant_ID', 'day', 'msf', 'MSFSC', 'positive_mean', 'time_as_float']].tolist()
+                    
+                    bestMeanOfDay = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['positive_mean', 'time_as_float']].tolist()
+                    
+                    latestTest = participantsDayData.loc[(participantsDayData['Test_nr'].idxmax()), ['positive_mean', 'time_as_float']].tolist()
 
-                    bestMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['Participant_ID', 'day', 'msf', 'MSFSC', 'positive_mean', 'time_as_float']].tolist()
+                    earliestTest.extend(bestMeanOfDay)
+                    earliestTest.extend(latestTest)
 
-                    if (not simpleFeatures):
-
-                        worstMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmax()), ['positive_mean', 'time_as_float']].tolist()
-
-                        bestMeanOfDaySet.extend(worstMeanOfDaySet)
-
-                    inputOutput_df.loc[len(inputOutput_df)]=bestMeanOfDaySet
+                    inputOutput_df.loc[len(inputOutput_df)]=earliestTest
 
     return inputOutput_df
 
-def inputOutputDataFreeDays(completeDataset_df, simpleFeatures):
+def inputOutputDataFreeDays(completeDataset_df):
 
     numberOfParticipants = int(completeDataset_df["Participant_ID"].max())
 
-    if (simpleFeatures):
-        features = ['Participant_ID', 'day', 'msf', 'MSFSC', 'best_mean', 'time_of_best']
-    else :
-        features = ['Participant_ID', 'day', 'msf', 'MSFSC', 'best_mean', 'time_of_best', 'worst_mean', 'time_of_worst']
+    features = ['Participant_ID', 'day', 'msf', 'MSFSC','earliest_test', 'earliest_time', 'best_mean', 'time_of_best', 'latest_test', 'latest_time']
 
     inputOutput_df = pd.DataFrame(columns = features)
 
@@ -176,16 +171,17 @@ def inputOutputDataFreeDays(completeDataset_df, simpleFeatures):
                 participantsDayData = participantData.loc[(participantData.day == day) & (participantData.Workday == 0)]
 
                 if (len(participantsDayData)>0):
+                    
+                    earliestTest = participantsDayData.loc[(participantsDayData['Test_nr'].idxmin()), ['Participant_ID', 'day', 'msf', 'MSFSC', 'positive_mean', 'time_as_float']].tolist()
+                    
+                    bestMeanOfDay = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['positive_mean', 'time_as_float']].tolist()
+                    
+                    latestTest = participantsDayData.loc[(participantsDayData['Test_nr'].idxmax()), ['positive_mean', 'time_as_float']].tolist()
 
-                    bestMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['Participant_ID', 'day', 'msf', 'MSFSC', 'positive_mean', 'time_as_float']].tolist()
+                    earliestTest.extend(bestMeanOfDay)
+                    earliestTest.extend(latestTest)
 
-                    if (not simpleFeatures):
-
-                        worstMeanOfDaySet = participantsDayData.loc[(participantsDayData['positive_mean'].idxmax()), ['positive_mean', 'time_as_float']].tolist()
-
-                        bestMeanOfDaySet.extend(worstMeanOfDaySet)
-
-                    inputOutput_df.loc[len(inputOutput_df)]=bestMeanOfDaySet
+                    inputOutput_df.loc[len(inputOutput_df)]=earliestTest
 
     return inputOutput_df
 
@@ -371,7 +367,6 @@ def splitByParticipant(train_x, train_y, test_x, test_y):
     startRow = 0
     endRow = 0
     for i in range(amountIds):
-        print (i)
         currentID = train_x['Participant_ID'][startRow]
         while (endRow<totalIds) and (currentID == train_x['Participant_ID'][endRow]):
             endRow = endRow + 1
