@@ -283,17 +283,6 @@ def createMSFMatrix():
 
     return msfMatrix
 
-def avg_from_timedelta_tuplelist(raw):
-    """
-    Converts list of tuples (a,b) to 2 separate lists (list of a, list of b). Picks for each list the
-    arithmetical middle.
-    :param raw: list of tuples
-    :return:
-    """
-    sd = sum([z for (y, z) in raw], timedelta(0)) / float(len(raw)) if len(raw) else timedelta(0)
-    so = sum([y for (y, z) in raw], timedelta(0)) / float(len(raw)) if len(raw) else timedelta(0)
-    return sd, so
-
 
 def median_from_timedelta_tuplelist(raw):
     """
@@ -304,14 +293,14 @@ def median_from_timedelta_tuplelist(raw):
     """
     if len(raw) == 0:
         return timedelta(0), timedelta(0)
-    else:
-        m = int((len(raw) - 1) / 2)
-        sd = sorted([z for (y, z) in raw])[m]
-        so = sorted([y for (y, z) in raw])[m]
-        return sd, so
+    m = int((len(raw) - 1) / 2)
+    sd = sorted([z for (y, z) in raw])[m]
+    so = sorted([y for (y, z) in raw])[m]  # type: datetime
+    so = timedelta(hours=so.hour, minutes=so.minute)
+    return sd, so
 
 
-def createMSF_SCMatrix(middle=avg_from_timedelta_tuplelist):
+def createMSF_SCMatrix(middle=median_from_timedelta_tuplelist):
     """
     Method to create MSF_SC for participants. Estimate, that MSF_SC is calculated over whole test area.
     :param middle: MSF_SC is a combined value. It consists out of many times. This function is used to pick the middle
@@ -320,7 +309,6 @@ def createMSF_SCMatrix(middle=avg_from_timedelta_tuplelist):
     """
     # load already enhanced label-set (added day column)
     diary = pd.read_csv('dataset/modifiedLabels.csv')
-
     numberOfParticipants = diary["Participant_ID"].max()
     msf_persist = {"Participant_ID": [], "MSFSC": []}
     for participant in range(numberOfParticipants):
@@ -335,7 +323,8 @@ def createMSF_SCMatrix(middle=avg_from_timedelta_tuplelist):
             participantDayData = participantSleepData[participantSleepData.day == day]
             sleepOnset = participantDayData["Time"].iloc[0]
             sleepOnset = datetime.strptime(sleepOnset, '%Y-%m-%d %H:%M:%S')
-            sleepOnset = timedelta(hours=sleepOnset.hour, minutes=sleepOnset.minute)
+            sleepOnset = sleepOnset - timedelta(days=day)
+            # sleepOnset = timedelta(hours=sleepOnset.hour, minutes=sleepOnset.minute)
             sleepDuration = timedelta(minutes=(len(participantDayData) * 15))
             # onset, duration
             tuple = (sleepOnset, sleepDuration)
@@ -343,7 +332,7 @@ def createMSF_SCMatrix(middle=avg_from_timedelta_tuplelist):
                 raw_work.append(tuple)
             else:
                 raw_free.append(tuple)
-
+        print([(str(x), str(y)) for (x, y) in raw_free])
         # avg calculation
         sd_f, so_f = middle(raw_free)
         sd_w, so_w = middle(raw_work)
