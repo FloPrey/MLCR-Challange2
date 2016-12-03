@@ -3,8 +3,8 @@ import Challenge2.RegressionModels as models
 
 dataset = dc.createDataSet()
 
-datasetFree = dc.inputOutputDataFreeDays(dataset, False)
-datasetWork = dc.inputOutputDataWorkDays(dataset, False)
+datasetFree = dc.inputOutputDataFreeDays(dataset)
+datasetWork = dc.inputOutputDataWorkDays(dataset)
 
 # split dataset into input (x-value) and output (y-value)
 inputDataFree, outputDataFree = dc.splitLabels(datasetFree)
