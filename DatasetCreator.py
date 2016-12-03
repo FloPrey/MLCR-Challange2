@@ -110,7 +110,8 @@ def createDataSet():
     raw_df = pd.read_hdf("dataset/data.h5", "raw")
     # load enhanced diary
     diary_df = pd.read_csv('dataset/modifiedLabels.csv')
-    extender(diary=diary_df, label=["Alcohol"], expand=1) # extend auswirkungen um 15 minuten - increase expand param to do more
+    # enhance diary
+    extender(diary=diary_df, label=["Alcohol", "Caffeine", "Food", "Medication", "Nicotine", "Sports"], expand=3)
     # change participant numbers as there are only 7
     raw_df.loc[raw_df['subject'] == 7, 'subject'] = 6
     raw_df.loc[raw_df['subject'] == 8, 'subject'] = 7
