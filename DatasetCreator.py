@@ -84,6 +84,25 @@ def joinFeaturesAndDiary(feature_df, diary_df):
 
     return inputData
 
+def extender(diary, label, expand):
+    if isinstance(label, list):
+        for e in label:
+            extender(diary, e, expand)
+    else:
+        ref = diary[label].tolist()
+        mod = list(diary[label].tolist())
+
+        for i in range(0, len(ref)):
+            if ref[i] == 1:
+                for y in range(0, expand):
+                    y = i + y + 1
+                    if y >= len(ref):
+                        y = len(ref) - 1
+                    mod[y] = 1
+
+        diary[label] = mod
+        print("DEBUG: (Original, Mod, Changed)", label, ": ", (ref.count(1), mod.count(1), diary[label].tolist().count(1)))
+
 '''Creates the complete Dataset containing all features, diary-labels and output label.'''
 def createDataSet():
 
@@ -91,7 +110,7 @@ def createDataSet():
     raw_df = pd.read_hdf("dataset/data.h5", "raw")
     # load enhanced diary
     diary_df = pd.read_csv('dataset/modifiedLabels.csv')
-
+    extender(diary=diary_df, label=["Alcohol"], expand=1) # extend auswirkungen um 15 minuten - increase expand param to do more
     # change participant numbers as there are only 7
     raw_df.loc[raw_df['subject'] == 7, 'subject'] = 6
     raw_df.loc[raw_df['subject'] == 8, 'subject'] = 7
