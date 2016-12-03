@@ -153,11 +153,11 @@ def inputOutputDataWorkDays(completeDataset_df):
                 participantsDayData = participantData.loc[(participantData.day == day) & (participantData.Workday == 1)]
 
                 if (len(participantsDayData)>0):
-                    
+
                     earliestTest = participantsDayData.loc[(participantsDayData['Test_nr'].idxmin()), ['Participant_ID', 'day', 'msf', 'MSFSC', 'positive_mean', 'time_as_float']].tolist()
-                    
+
                     bestMeanOfDay = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['positive_mean', 'time_as_float']].tolist()
-                    
+
                     latestTest = participantsDayData.loc[(participantsDayData['Test_nr'].idxmax()), ['positive_mean', 'time_as_float']].tolist()
 
                     earliestTest.extend(bestMeanOfDay)
@@ -191,11 +191,11 @@ def inputOutputDataFreeDays(completeDataset_df):
                 participantsDayData = participantData.loc[(participantData.day == day) & (participantData.Workday == 0)]
 
                 if (len(participantsDayData)>0):
-                    
+
                     earliestTest = participantsDayData.loc[(participantsDayData['Test_nr'].idxmin()), ['Participant_ID', 'day', 'msf', 'MSFSC', 'positive_mean', 'time_as_float']].tolist()
-                    
+
                     bestMeanOfDay = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['positive_mean', 'time_as_float']].tolist()
-                    
+
                     latestTest = participantsDayData.loc[(participantsDayData['Test_nr'].idxmax()), ['positive_mean', 'time_as_float']].tolist()
 
                     earliestTest.extend(bestMeanOfDay)
@@ -296,6 +296,17 @@ def median_from_timedelta_tuplelist(raw):
     m = int((len(raw) - 1) / 2)
     sd = sorted([z for (y, z) in raw])[m]
     so = sorted([y for (y, z) in raw])[m]  # type: datetime
+    so = timedelta(hours=so.hour, minutes=so.minute)
+    return sd, so
+
+
+def avg_from_timedelta_tuplelist(raw):
+    if len(raw) == 0:
+        return timedelta(0), timedelta(0)
+    sd = sum([z for (y, z) in raw], timedelta(0)) / len(raw)
+
+    so = datetime.fromtimestamp(sum([y.timestamp() for (y, z) in raw]) / len(raw))
+    print(so)
     so = timedelta(hours=so.hour, minutes=so.minute)
     return sd, so
 
