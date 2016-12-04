@@ -3,7 +3,6 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 from sklearn import linear_model
 from math import sqrt
-import types
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import tree
@@ -12,19 +11,11 @@ from sklearn.ensemble import AdaBoostRegressor as AdaboostR
 
 def trainDecisionTreeModel(inputData, outputData, workOrFreeDay):
     
-    del inputData['Participant_ID']
-    del inputData['day']
-    
     regressor = DTR(random_state=0, max_depth = 5)
     predicted = cross_val_predict(regressor, inputData, outputData, cv=10)
     printEvaluationScores(predicted, outputData, "Simple DecisionTree", workOrFreeDay)
     
 def adaBoostModel(train_x, train_y, test_x, test_y, workOrFreeDay):
-    
-    del train_x['Participant_ID']
-    del test_x['Participant_ID']
-    del train_x['day']
-    del test_x['day']
     
     rng = np.random.RandomState(1)
     
@@ -35,13 +26,23 @@ def adaBoostModel(train_x, train_y, test_x, test_y, workOrFreeDay):
     # show test results 
     printEvaluationScores(predicted, test_y, "AdaBoost with train/test set", workOrFreeDay)  
     
+    # Predict without MSFSC
+    x_trainWithoutMSFSC = train_x.copy()
+    x_testWithoutMSFSC = test_x.copy()
+    
+    del x_trainWithoutMSFSC['MSFSC']
+    del x_testWithoutMSFSC['MSFSC']
+    
+    adaBoost.fit(x_trainWithoutMSFSC, train_y)
+    predicted = adaBoost.predict(x_testWithoutMSFSC)
+    
+    # show test results 
+    printEvaluationScores(predicted, test_y, "AdaBoost with train/test set and without MSFsc", workOrFreeDay) 
+    
     # invokes method to print the tree structure of the 300 trained tree
     #saveTreeStrucutre(adaBoost)
 
 def adaBoostModelWithCrossFoldValidation(inputData, outputData, workOrFreeDay):
-    
-    del inputData['Participant_ID']
-    del inputData['day']
       
     rng = np.random.RandomState(1)
     adaBoost = AdaboostR(DTR(max_depth=5), n_estimators=300, random_state=rng)
@@ -50,7 +51,17 @@ def adaBoostModelWithCrossFoldValidation(inputData, outputData, workOrFreeDay):
     adaBoostPredict = cross_val_predict(adaBoost, inputData, outputData, cv=len(inputData))   
     
     # show test results 
-    printEvaluationScores(adaBoostPredict, outputData, "AdaBoost using leave one out predict", workOrFreeDay)    
+    printEvaluationScores(adaBoostPredict, outputData, "AdaBoost using leave one out predict", workOrFreeDay)  
+    
+        # Predict without MSFSC
+    dataWithoutMSFSC = inputData.copy()
+    
+    del dataWithoutMSFSC['MSFSC']
+    adaBoostPredict = cross_val_predict(adaBoost, dataWithoutMSFSC, outputData, cv=len(inputData))
+    
+    # show test results 
+    printEvaluationScores(adaBoostPredict, outputData, "AdaBoost using leave one out predict and without MSFsc", workOrFreeDay)
+    
     
 def printEvaluationScores(predicted, groundTruth, modelName, workOrFreeDay):
     
@@ -82,58 +93,48 @@ def saveTreeStrucutre(adaBoostModel):
 
 def trainWeightedLinearRegression(X_train, y_train, X_test, y_test, workOrFreeDay):
 
-    del X_train['Participant_ID']
-    del X_test['Participant_ID']
-    del X_train['day']
-    del X_test['day']
-
     reg = linear_model.Ridge(alpha=0.5)
 
     reg.fit(X_train, y_train)
     predict = reg.predict(X_test)
-    score = reg.score(X_test, y_test)
 
     # show test results
     printEvaluationScores(predict, y_test, "Weightened Linear Regression with MSFsc", workOrFreeDay)
-
+    
     # Predict without MSFSC
-    del X_train['MSFSC']
-    del X_test['MSFSC']
+    x_trainWithoutMSFSC = X_train.copy()
+    x_testWithoutMSFSC = X_test.copy()
+    
+    del x_trainWithoutMSFSC['MSFSC']
+    del x_testWithoutMSFSC['MSFSC']
 
     reg = linear_model.Ridge(alpha=0.5)
 
-    reg.fit(X_train, y_train)
-    predict = reg.predict(X_test)
-    score = reg.score(X_test, y_test)
+    reg.fit(x_trainWithoutMSFSC, y_train)
+    predict = reg.predict(x_testWithoutMSFSC)
 
     # show test results
     printEvaluationScores(predict, y_test, "Weightened Linear Regression without MSFsc", workOrFreeDay)
 
-
-
 def trainLinearRegression(X_train, y_train, X_test, y_test, workOrFreeDay):
-
-    del X_train['Participant_ID']
-    del X_test['Participant_ID']
-    del X_train['day']
-    del X_test['day']
 
     reg = linear_model.LinearRegression()
 
-    model = reg.fit(X_train, y_train)
+    reg.fit(X_train, y_train)
     predict = reg.predict(X_test)
-    score = reg.score(X_test, y_test)
 
     # show test results
     printEvaluationScores(predict, y_test, "Linear Regression with MSFsc", workOrFreeDay)
 
     # Predict without MSFSC
-    del X_train['MSFSC']
-    del X_test['MSFSC']
+    x_trainWithoutMSFSC = X_train.copy()
+    x_testWithoutMSFSC = X_test.copy()
+    
+    del x_trainWithoutMSFSC['MSFSC']
+    del x_testWithoutMSFSC['MSFSC']
 
-    model = reg.fit(X_train, y_train)
-    predict = reg.predict(X_test)
-    score = reg.score(X_test, y_test)
+    reg.fit(x_trainWithoutMSFSC, y_train)
+    predict = reg.predict(x_testWithoutMSFSC)
 
     # show test results
     printEvaluationScores(predict, y_test, "Linear Regression without MSFsc", workOrFreeDay)
