@@ -3,6 +3,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 from sklearn import linear_model
 from math import sqrt
+import types
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import tree
@@ -58,10 +59,8 @@ def printEvaluationScores(predicted, groundTruth, modelName, workOrFreeDay):
     
     print("--------------------------")
     print("%(1)s - Regression Model trained on %(2)s data:" % {"1" : modelName, "2" : workOrFreeDay})
-    print("R² score of:")
-    print(r2Value)
-    print("And RMSe of:")
-    print(RMSe)
+    print("R² score of:\t", prettyprint(r2Value))
+    print("And RMSe of:\t", prettyprint(RMSe))
     
     fig, ax = plt.subplots()
     ax.scatter(groundTruth, predicted)
@@ -91,30 +90,81 @@ def trainWeightedLinearRegression(X_train, y_train, X_test, y_test):
     reg.fit(X_train, y_train)
     predict = reg.predict(X_test)
     score = reg.score(X_test, y_test)
+    RMSe = sqrt(mean_squared_error(y_test, predict))
 
     print("------------Test Results Weighted Linear Regression:------------------")
-    print("True Values:")
-    print(y_test)
-    print("Predicted Values:")
-    print(predict)
-    print("Reached Score(R²):")
-    print(score)
+    print("------------------------------With MSFsc------------------------------")
+    print("True Values:\t", prettyprint(y_test))
+    print("Predicted Values:\t", prettyprint(predict))
+    print("R²:\t", prettyprint(score))
+    print("RMSe:\t", prettyprint(RMSe))
+    print("-------------End Result--------------------")
+
+    # Predict without MSFSC
+    del X_train['MSFSC']
+    del X_test['MSFSC']
+
+    reg = linear_model.Ridge(alpha=0.5)
+
+    reg.fit(X_train, y_train)
+    predict = reg.predict(X_test)
+    score = reg.score(X_test, y_test)
+    RMSe = sqrt(mean_squared_error(y_test, predict))
+
+    print("------------Test Results Weighted Linear Regression:------------------")
+    print("----------------------------Without MSFsc-----------------------------")
+    print("True Values:\t", prettyprint(y_test))
+    print("Predicted Values:\t", prettyprint(predict))
+    print("R²:\t", prettyprint(score))
+    print("RMSe:\t", prettyprint(RMSe))
     print("-------------End Result--------------------")
 
 
+
 def trainLinearRegression(X_train, y_train, X_test, y_test):
+
+    del X_train['Participant_ID']
+    del X_test['Participant_ID']
+    del X_train['day']
+    del X_test['day']
 
     reg = linear_model.LinearRegression()
 
     model = reg.fit(X_train, y_train)
     predict = reg.predict(X_test)
     score = reg.score(X_test, y_test)
+    RMSe = sqrt(mean_squared_error(y_test, predict))
 
-    print("------------Test Result Linear Regression:------------------")
-    print("True Values:")
-    print(y_test)
-    print("Predicted Values:")
-    print(predict)
-    print("Reached Score(R²):")
-    print(score)
-    print("-------------End Result--------------------")    
+    print("--------------------Test Result Linear Regression:--------------------")
+    print("------------------------------With MSFsc------------------------------")
+    print("True Values:\t", prettyprint(y_test))
+    print("Predicted Values:\t", prettyprint(predict))
+    print("R²:\t", prettyprint(score))
+    print("RMSe:\t", prettyprint(RMSe))
+    print("-------------End Result--------------------")
+
+    # Predict without MSFSC
+    del X_train['MSFSC']
+    del X_test['MSFSC']
+
+    model = reg.fit(X_train, y_train)
+    predict = reg.predict(X_test)
+    score = reg.score(X_test, y_test)
+    RMSe = sqrt(mean_squared_error(y_test, predict))
+
+    print("-------------------Test Result Linear Regression:---------------------")
+    print("----------------------------Without MSFsc-----------------------------")
+    print("True Values:\t", prettyprint(y_test))
+    print("Predicted Values:\t", prettyprint(predict))
+    print("R²:\t", prettyprint(score))
+    print("RMSe:\t", prettyprint(RMSe))
+    print("-------------End Result--------------------")
+
+def prettyprint(input):
+    output = ""
+    if isinstance(input, list ):
+        for item in input:
+            output = output + '\t' + str(item).replace('.', ',')
+    else:
+        output = str(input).replace('.', ',')
+    return output
