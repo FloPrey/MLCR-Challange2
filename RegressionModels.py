@@ -26,6 +26,9 @@ def adaBoostModel(train_x, train_y, test_x, test_y, workOrFreeDay):
     # show test results 
     printEvaluationScores(predicted, test_y, "AdaBoost model with MSFsc", workOrFreeDay)  
     
+    # invokes method to print the tree structure of the 300 trained tree
+    #saveTreeStrucutre(adaBoost)
+    
     # Predict without MSFSC
     x_trainWithoutMSFSC = train_x.copy()
     x_testWithoutMSFSC = test_x.copy()
@@ -38,9 +41,6 @@ def adaBoostModel(train_x, train_y, test_x, test_y, workOrFreeDay):
     
     # show test results 
     printEvaluationScores(predicted, test_y, "AdaBoost model with without MSFsc", workOrFreeDay) 
-    
-    # invokes method to print the tree structure of the 300 trained tree
-    #saveTreeStrucutre(adaBoost)
 
 def adaBoostModelWithCrossFoldValidation(inputData, outputData, workOrFreeDay):
       
