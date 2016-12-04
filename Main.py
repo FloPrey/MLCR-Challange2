@@ -16,29 +16,29 @@ trainF_x, trainF_y, testF_x, testF_y = dc.splitDataset(datasetFree)
 trainW_x, trainW_y, testW_x, testW_y = dc.splitDataset(datasetWork)
 
 # use entire dataset for training with cross-fold-validation
-print("Workdays AdaBoost with leave-one-out validation:")
+print("Training AdaBoost with leave-one-out validation on workday data:")
 models.adaBoostModelWithCrossFoldValidation(inputDataWork, outputDataWork, "Workdays")
 
-print("\nFreedays AdaBoost with leave-one-out validation:")
+print("Training AdaBoost with leave-one-out validation on freeday data:")
 models.adaBoostModelWithCrossFoldValidation(inputDataFree, outputDataFree, "Freedays")
 
 # use already split dataset 
-print("\nWorkdays AdaBoost on test and train set:")
+print("\n\n Training AdaBoost with test and train set on workday data:")
 models.adaBoostModel(trainW_x, trainW_y, testW_x, testW_y, "Workdays")
 
-print("\nFreedays AdaBoost on test and train set:")
+print("\n\n Training AdaBoost with test and train set on freeday data:")
 models.adaBoostModel(trainF_x, trainF_y, testF_x, testF_y, "Freedays")
 
 # linear regression
 
-print("\n\nWorkdays Linear:")
+print("\n\nTraining Linear Regression Model on workday data:")
 models.trainLinearRegression(trainW_x, trainW_y, testW_x, testW_y, "Workday")
 
-print("\n\nWorkdays weightened:")
-models.trainWeightedLinearRegression(trainW_x, trainW_y, testW_x, testW_y, "Workday")
-
-print("\n\nFreedays Linear:")
+print("\n\nTraining Linear Regression Model on freeday data:")
 models.trainLinearRegression(trainF_x, trainF_y, testF_x, testF_y, "Freeday")
 
-print("\n\nFreedays Weightened:")
+print("\n\nTraining weightened Linear Regression Model on workday data:")
+models.trainWeightedLinearRegression(trainW_x, trainW_y, testW_x, testW_y, "Workday")
+
+print("\n\nTraining weightened Linear Regression Model on freeday data:")
 models.trainWeightedLinearRegression(trainF_x, trainF_y, testF_x, testF_y, "Freeday")
