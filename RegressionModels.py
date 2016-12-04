@@ -24,7 +24,7 @@ def adaBoostModel(train_x, train_y, test_x, test_y, workOrFreeDay):
     predicted = adaBoost.predict(test_x)
     
     # show test results 
-    printEvaluationScores(predicted, test_y, "AdaBoost with train/test set", workOrFreeDay)  
+    printEvaluationScores(predicted, test_y, "AdaBoost model with MSFsc", workOrFreeDay)  
     
     # Predict without MSFSC
     x_trainWithoutMSFSC = train_x.copy()
@@ -37,7 +37,7 @@ def adaBoostModel(train_x, train_y, test_x, test_y, workOrFreeDay):
     predicted = adaBoost.predict(x_testWithoutMSFSC)
     
     # show test results 
-    printEvaluationScores(predicted, test_y, "AdaBoost with train/test set and without MSFsc", workOrFreeDay) 
+    printEvaluationScores(predicted, test_y, "AdaBoost model with without MSFsc", workOrFreeDay) 
     
     # invokes method to print the tree structure of the 300 trained tree
     #saveTreeStrucutre(adaBoost)
@@ -51,7 +51,7 @@ def adaBoostModelWithCrossFoldValidation(inputData, outputData, workOrFreeDay):
     adaBoostPredict = cross_val_predict(adaBoost, inputData, outputData, cv=len(inputData))   
     
     # show test results 
-    printEvaluationScores(adaBoostPredict, outputData, "AdaBoost using leave one out predict", workOrFreeDay)  
+    printEvaluationScores(adaBoostPredict, outputData, "AdaBoost model with MSFsc", workOrFreeDay)  
     
         # Predict without MSFSC
     dataWithoutMSFSC = inputData.copy()
@@ -60,7 +60,7 @@ def adaBoostModelWithCrossFoldValidation(inputData, outputData, workOrFreeDay):
     adaBoostPredict = cross_val_predict(adaBoost, dataWithoutMSFSC, outputData, cv=len(inputData))
     
     # show test results 
-    printEvaluationScores(adaBoostPredict, outputData, "AdaBoost using leave one out predict and without MSFsc", workOrFreeDay)
+    printEvaluationScores(adaBoostPredict, outputData, "AdaBoost model without MSFsc", workOrFreeDay)
     
     
 def printEvaluationScores(predicted, groundTruth, modelName, workOrFreeDay):
@@ -68,8 +68,9 @@ def printEvaluationScores(predicted, groundTruth, modelName, workOrFreeDay):
     r2Value = r2_score(groundTruth, predicted)
     RMSe = sqrt(mean_squared_error(groundTruth, predicted)) 
     
-    print("--------------------------")
-    print("%(1)s - Regression Model trained on %(2)s data:" % {"1" : modelName, "2" : workOrFreeDay})
+    print("\n----------------------------")
+    print("%s - trained" %modelName) 
+    print("----on %s data:" %workOrFreeDay + "-------")
     print("R² score of:\t", prettyprint(r2Value))
     print("And RMSe of:\t", prettyprint(RMSe))
     
