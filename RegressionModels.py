@@ -51,7 +51,7 @@ def adaBoostModelWithCrossFoldValidation(inputData, outputData, workOrFreeDay):
     adaBoostPredict = cross_val_predict(adaBoost, inputData, outputData, cv=len(inputData))   
     
     # show test results 
-    printEvaluationScores(adaBoostPredict, outputData, "AdaBoost model with MSFsc", workOrFreeDay)  
+    printEvaluationScores(adaBoostPredict, outputData, "AdaBoost model with MSFsc and LOO prediction", workOrFreeDay)  
     
         # Predict without MSFSC
     dataWithoutMSFSC = inputData.copy()
@@ -60,7 +60,7 @@ def adaBoostModelWithCrossFoldValidation(inputData, outputData, workOrFreeDay):
     adaBoostPredict = cross_val_predict(adaBoost, dataWithoutMSFSC, outputData, cv=len(inputData))
     
     # show test results 
-    printEvaluationScores(adaBoostPredict, outputData, "AdaBoost model without MSFsc", workOrFreeDay)
+    printEvaluationScores(adaBoostPredict, outputData, "AdaBoost model without MSFsc and LOO prediction", workOrFreeDay)
     
     
 def printEvaluationScores(predicted, groundTruth, modelName, workOrFreeDay):
