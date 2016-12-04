@@ -15,12 +15,15 @@ The main method will invoke the following models:
 
 1. AdaBoost Regression Model using leave-one-out prediction / validation on Workday data
 2. AdaBoost Regression Model using leave-one-out prediction / validation on Freeday data
-3. AdaBoost Regression Model using predefined test and train set on Workday data
-4. AdaBoost Regression Model using predefined test and train set on Freeday data
-5. Linear Regression Model 
+3. AdaBoost Regression Model using the predefined test and train set on Workday data
+4. AdaBoost Regression Model using the predefined test and train set on Freeday data
+5. Linear Regression Model using the predefined test and train set on Workday data
+6. Linear Regression Model using the predefined test and train set on Freeday data
 
 The output of the programme will show :
 
 1. R² score of the regression models
 2. RSMe score of the regression models
 3. Prediction to ground truth diagram of the regression models.
+
+--> Please make sure to close or save the diagrams to get the rest of the results to show.
