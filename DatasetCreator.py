@@ -143,7 +143,7 @@ def inputOutputDataWorkDays(completeDataset_df):
 
     numberOfParticipants = int(completeDataset_df["Participant_ID"].max())
 
-    features = ['Participant_ID', 'day', 'msf', 'MSFSC','earliest_test', 'earliest_time', 'best_mean', 'time_of_best', 'latest_test', 'latest_time']
+    features = ['Participant_ID', 'day', 'msf', 'MSFSC', 'Alarmclock', "Alcohol", "Caffeine", "Food", "Medication", "Nicotine", "Sports", 'earliest_test', 'earliest_time', 'best_mean', 'time_of_best', 'latest_test', 'latest_time']
 
     inputOutput_df = pd.DataFrame(columns = features)
 
@@ -164,7 +164,7 @@ def inputOutputDataWorkDays(completeDataset_df):
 
                 if (len(participantsDayData)>0):
 
-                    earliestTest = participantsDayData.loc[(participantsDayData['Test_nr'].idxmin()), ['Participant_ID', 'day', 'msf', 'MSFSC', 'positive_mean', 'time_as_float']].tolist()
+                    earliestTest = participantsDayData.loc[(participantsDayData['Test_nr'].idxmin()), ['Participant_ID', 'day', 'msf', 'MSFSC', 'Alarmclock', "Alcohol", "Caffeine", "Food", "Medication", "Nicotine", "Sports", 'positive_mean', 'time_as_float']].tolist()
 
                     bestMeanOfDay = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['positive_mean', 'time_as_float']].tolist()
 
@@ -181,7 +181,7 @@ def inputOutputDataFreeDays(completeDataset_df):
 
     numberOfParticipants = int(completeDataset_df["Participant_ID"].max())
 
-    features = ['Participant_ID', 'day', 'msf', 'MSFSC','earliest_test', 'earliest_time', 'best_mean', 'time_of_best', 'latest_test', 'latest_time']
+    features = ['Participant_ID', 'day', 'msf', 'MSFSC', 'Alarmclock', "Alcohol", "Caffeine", "Food", "Medication", "Nicotine", "Sports", 'earliest_test', 'earliest_time', 'best_mean', 'time_of_best', 'latest_test', 'latest_time']
 
     inputOutput_df = pd.DataFrame(columns = features)
 
@@ -202,7 +202,7 @@ def inputOutputDataFreeDays(completeDataset_df):
 
                 if (len(participantsDayData)>0):
 
-                    earliestTest = participantsDayData.loc[(participantsDayData['Test_nr'].idxmin()), ['Participant_ID', 'day', 'msf', 'MSFSC', 'positive_mean', 'time_as_float']].tolist()
+                    earliestTest = participantsDayData.loc[(participantsDayData['Test_nr'].idxmin()), ['Participant_ID', 'day', 'msf', 'MSFSC', 'Alarmclock', "Alcohol", "Caffeine", "Food", "Medication", "Nicotine", "Sports", 'positive_mean', 'time_as_float']].tolist()
 
                     bestMeanOfDay = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['positive_mean', 'time_as_float']].tolist()
 
