@@ -274,6 +274,11 @@ def splitDataset(inputOutput_df):
     # extract and delete the output values
     test_y = test_x["msf"].tolist()
     test_x.drop('msf', axis=1, inplace=True)
+    
+    del train_x['Participant_ID']
+    del test_x['Participant_ID']
+    del train_x['day']
+    del test_x['day']
 
     return train_x, train_y, test_x, test_y
 
