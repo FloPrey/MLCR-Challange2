@@ -26,10 +26,23 @@ models.adaBoostModel(trainF_x, trainF_y, testF_x, testF_y, "Freedays")
 
 
 # linear regression
-splitTrainW_x, splitTrainW_y, splitTestW_x, splitTextW_y = dc.splitByParticipant(trainW_x, trainW_y, testW_x, testW_y)
-splitTrainF_x, splitTrainF_y, splitTestF_x, splitTextF_y = dc.splitByParticipant(trainF_x, trainF_y, testF_x, testF_y)
 
-for i in range (len(splitTrainW_x)):
-    print ("Linear Regression Participant, ", i)
-    models.trainLinearRegression(trainW_x[i], trainW_y[i], testW_x[i], testW_y[i])
-    models.trainWeightedLinearRegression(trainW_x[i], trainW_y[i], testW_x[i], testW_y[i])
+
+print("\n\nWorkdays Linear:")
+trainW_x, trainW_y, testW_x, testW_y = dc.splitDataset(datasetWork)
+models.trainLinearRegression(trainW_x, trainW_y, testW_x, testW_y, "Workday")
+
+
+print("\n\nWorkdays weightened:")
+trainW_x, trainW_y, testW_x, testW_y = dc.splitDataset(datasetWork)
+models.trainWeightedLinearRegression(trainW_x, trainW_y, testW_x, testW_y, "Workday")
+
+
+print("\n\nFreedays Linear:")
+trainF_x, trainF_y, testF_x, testF_y = dc.splitDataset(datasetFree)
+models.trainLinearRegression(trainF_x, trainF_y, testF_x, testF_y, "Freeday")
+
+
+print("\n\nFreedays Weightened:")
+trainF_x, trainF_y, testF_x, testF_y = dc.splitDataset(datasetFree)
+models.trainWeightedLinearRegression(trainF_x, trainF_y, testF_x, testF_y, "Freeday")

@@ -80,7 +80,7 @@ def saveTreeStrucutre(adaBoostModel):
         tree.export_graphviz(tree_in_forest, out_file = my_file)
         i_tree = i_tree + 1  
 
-def trainWeightedLinearRegression(X_train, y_train, X_test, y_test):
+def trainWeightedLinearRegression(X_train, y_train, X_test, y_test, workOrFreeDay):
 
     del X_train['Participant_ID']
     del X_test['Participant_ID']
@@ -92,15 +92,9 @@ def trainWeightedLinearRegression(X_train, y_train, X_test, y_test):
     reg.fit(X_train, y_train)
     predict = reg.predict(X_test)
     score = reg.score(X_test, y_test)
-    RMSe = sqrt(mean_squared_error(y_test, predict))
 
-    print("------------Test Results Weighted Linear Regression:------------------")
-    print("------------------------------With MSFsc------------------------------")
-    print("True Values:\t", prettyprint(y_test))
-    print("Predicted Values:\t", prettyprint(predict))
-    print("R²:\t", prettyprint(score))
-    print("RMSe:\t", prettyprint(RMSe))
-    print("-------------End Result--------------------")
+    # show test results
+    printEvaluationScores(predict, y_test, "Weightened Linear Regression with MSFsc", workOrFreeDay)
 
     # Predict without MSFSC
     del X_train['MSFSC']
@@ -111,19 +105,13 @@ def trainWeightedLinearRegression(X_train, y_train, X_test, y_test):
     reg.fit(X_train, y_train)
     predict = reg.predict(X_test)
     score = reg.score(X_test, y_test)
-    RMSe = sqrt(mean_squared_error(y_test, predict))
 
-    print("------------Test Results Weighted Linear Regression:------------------")
-    print("----------------------------Without MSFsc-----------------------------")
-    print("True Values:\t", prettyprint(y_test))
-    print("Predicted Values:\t", prettyprint(predict))
-    print("R²:\t", prettyprint(score))
-    print("RMSe:\t", prettyprint(RMSe))
-    print("-------------End Result--------------------")
+    # show test results
+    printEvaluationScores(predict, y_test, "Weightened Linear Regression without MSFsc", workOrFreeDay)
 
 
 
-def trainLinearRegression(X_train, y_train, X_test, y_test):
+def trainLinearRegression(X_train, y_train, X_test, y_test, workOrFreeDay):
 
     del X_train['Participant_ID']
     del X_test['Participant_ID']
@@ -135,15 +123,9 @@ def trainLinearRegression(X_train, y_train, X_test, y_test):
     model = reg.fit(X_train, y_train)
     predict = reg.predict(X_test)
     score = reg.score(X_test, y_test)
-    RMSe = sqrt(mean_squared_error(y_test, predict))
 
-    print("--------------------Test Result Linear Regression:--------------------")
-    print("------------------------------With MSFsc------------------------------")
-    print("True Values:\t", prettyprint(y_test))
-    print("Predicted Values:\t", prettyprint(predict))
-    print("R²:\t", prettyprint(score))
-    print("RMSe:\t", prettyprint(RMSe))
-    print("-------------End Result--------------------")
+    # show test results
+    printEvaluationScores(predict, y_test, "Linear Regression with MSFsc", workOrFreeDay)
 
     # Predict without MSFSC
     del X_train['MSFSC']
@@ -152,15 +134,9 @@ def trainLinearRegression(X_train, y_train, X_test, y_test):
     model = reg.fit(X_train, y_train)
     predict = reg.predict(X_test)
     score = reg.score(X_test, y_test)
-    RMSe = sqrt(mean_squared_error(y_test, predict))
 
-    print("-------------------Test Result Linear Regression:---------------------")
-    print("----------------------------Without MSFsc-----------------------------")
-    print("True Values:\t", prettyprint(y_test))
-    print("Predicted Values:\t", prettyprint(predict))
-    print("R²:\t", prettyprint(score))
-    print("RMSe:\t", prettyprint(RMSe))
-    print("-------------End Result--------------------")
+    # show test results
+    printEvaluationScores(predict, y_test, "Linear Regression without MSFsc", workOrFreeDay)
 
 def prettyprint(input):
     output = ""
