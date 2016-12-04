@@ -63,6 +63,7 @@ def printEvaluationScores(predicted, groundTruth, modelName, workOrFreeDay):
     print("And RMSe of:")
     print(RMSe)
     
+    # create prediction to ground truth diagram
     fig, ax = plt.subplots()
     ax.scatter(groundTruth, predicted)
     ax.plot([min(groundTruth, key=float), max(groundTruth, key=float)], [min(groundTruth, key=float), max(groundTruth, key=float)], 'k--', lw=4)
@@ -71,8 +72,9 @@ def printEvaluationScores(predicted, groundTruth, modelName, workOrFreeDay):
     plt.title(modelName + " on " + workOrFreeDay)
     plt.show()
 
+"""Method to save the 300 decision trees in the decisionTrees folder. To change the files into png use the bash script in the readme."""    
 def saveTreeStrucutre(adaBoostModel):
-    
+
     i_tree = 0
     for tree_in_forest in adaBoostModel.estimators_:
         my_file = 'decisionTrees/tree_' + str(i_tree) + '.dot' 
