@@ -19,6 +19,9 @@ The main method will invoke the following models:
 4. AdaBoost Regression Model using the predefined test and train set on Freeday data
 5. Linear Regression Model using the predefined test and train set on Workday data
 6. Linear Regression Model using the predefined test and train set on Freeday data
+7. Weighted Linear Regression Model using the predefined test and train set on Workday data
+8. We ightedLinear Regression Model using the predefined test and train set on Freeday data
+
 
 The output of the programme will show :
 
