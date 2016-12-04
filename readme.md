@@ -26,7 +26,10 @@ The main method will invoke the following models:
 The output of the programme will show :
 
 1. R² score of the regression models
+  - with and without MSFsc feature
 2. RSMe score of the regression models
-3. Prediction to ground truth diagram of the regression models.
+  - with and without MSFsc feature
+3. Prediction to ground truth diagram of the regression models
+  - with and without MSFsc feature
 
 --> Please make sure to close or save the diagrams to get the rest of the results to show.
