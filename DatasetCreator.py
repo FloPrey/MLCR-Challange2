@@ -53,6 +53,7 @@ def compute_features(test_df, verbose=False):
     return features
 
 def computeBasicFeatures(raw_df):
+    """Method to invoke the feature creation method."""
 
     feature_df = pd.DataFrame()  # not declared in sample code
     for subject_id, subject_df in raw_df.groupby(raw_df.subject):
@@ -68,12 +69,15 @@ def computeBasicFeatures(raw_df):
     return feature_df
 
 def joinFeaturesAndDiary(feature_df, diary_df):
+    """Method to join the diary information (alcohol, food consumption...)
+    with the recorded reaction time data."""
 
     newTimeList = list()
     timeList = feature_df["Test_time"].tolist()
 
     for item in timeList:
 
+        # round the minutes of the time of the reaction test to fit the 15 min steps of the diary
         rounded_qtr_hour = 15*(item.minute // 15)
 
         newTimeList.append(str(item.replace(minute=rounded_qtr_hour, second=0)))
@@ -112,9 +116,9 @@ def extender(diary, label, expand):
 
         diary[label] = mod
         
-'''Creates the complete Dataset containing all features, diary-labels and output label.'''
 def createDataSet():
-
+    '''Creates the complete Dataset containing all features, diary-labels and output label.'''
+    
     # load rawData
     raw_df = pd.read_hdf("dataset/data.h5", "raw")
     # load enhanced diary
@@ -139,6 +143,7 @@ def createDataSet():
     return completeDataset_df
 
 def inputOutputDataWorkDays(completeDataset_df):
+    """Method returns all data taken / recorded on a workdays."""
 
     numberOfParticipants = int(completeDataset_df["Participant_ID"].max())
 
@@ -150,7 +155,7 @@ def inputOutputDataWorkDays(completeDataset_df):
 
         participant = participant+1
 
-        # Get all all sleep moments of the current participant
+        # get all all data of current participant
         participantData = completeDataset_df.loc[(completeDataset_df.Participant_ID == participant)]
 
         for day in range(participantData["day"].max()):
@@ -159,24 +164,31 @@ def inputOutputDataWorkDays(completeDataset_df):
 
             if (any(participantData.day == day)):
 
+                # get all data of current participant at the current awake cycle
+                # only select if the day is a workday
                 participantsDayData = participantData.loc[(participantData.day == day) & (participantData.Workday == 1)]
 
                 if (len(participantsDayData)>0):
-
+                    
+                    # set containing main features, labels and the earliest test of the awake cycle
                     earliestTest = participantsDayData.loc[(participantsDayData['Test_nr'].idxmin()), ['Participant_ID', 'day', 'msf', 'MSFSC', 'Alarmclock', "Alcohol", "Caffeine", "Food", "Medication", "Nicotine", "Sports", 'positive_mean', 'time_as_float']].tolist()
-
+                    
+                    # set containing the best test of the current awake cycle
                     bestMeanOfDay = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['positive_mean', 'time_as_float']].tolist()
 
+                    # set containg the latest test of the awake cycle
                     latestTest = participantsDayData.loc[(participantsDayData['Test_nr'].idxmax()), ['positive_mean', 'time_as_float']].tolist()
 
                     earliestTest.extend(bestMeanOfDay)
                     earliestTest.extend(latestTest)
-
+                    
+                    # append all feauteres to the dataframe
                     inputOutput_df.loc[len(inputOutput_df)]=earliestTest
 
     return inputOutput_df
 
 def inputOutputDataFreeDays(completeDataset_df):
+    """Method returns all data taken / recorded on a freedays."""
 
     numberOfParticipants = int(completeDataset_df["Participant_ID"].max())
 
@@ -188,7 +200,7 @@ def inputOutputDataFreeDays(completeDataset_df):
 
         participant = participant+1
 
-        # Get all all sleep moments of the current participant
+        # get all all data of current participant
         participantData = completeDataset_df.loc[(completeDataset_df.Participant_ID == participant)]
 
         for day in range(participantData["day"].max()):
@@ -196,25 +208,32 @@ def inputOutputDataFreeDays(completeDataset_df):
             day = day+1
 
             if (any(participantData.day == day)):
-
+                
+                # get all data of current participant at the current awake cycle
+                # only select if the day is not a workday
                 participantsDayData = participantData.loc[(participantData.day == day) & (participantData.Workday == 0)]
 
                 if (len(participantsDayData)>0):
-
+                    
+                    # set containing main features, labels and the earliest test of the awake cycle
                     earliestTest = participantsDayData.loc[(participantsDayData['Test_nr'].idxmin()), ['Participant_ID', 'day', 'msf', 'MSFSC', 'Alarmclock', "Alcohol", "Caffeine", "Food", "Medication", "Nicotine", "Sports", 'positive_mean', 'time_as_float']].tolist()
-
+                    
+                    # set containing the best test of the current awake cycle
                     bestMeanOfDay = participantsDayData.loc[(participantsDayData['positive_mean'].idxmin()), ['positive_mean', 'time_as_float']].tolist()
-
+                    
+                    # set containg the latest test of the awake cycle
                     latestTest = participantsDayData.loc[(participantsDayData['Test_nr'].idxmax()), ['positive_mean', 'time_as_float']].tolist()
 
                     earliestTest.extend(bestMeanOfDay)
                     earliestTest.extend(latestTest)
 
+                    # append all feauteres to the dataframe
                     inputOutput_df.loc[len(inputOutput_df)]=earliestTest
 
     return inputOutput_df
 
 def splitLabels(inputOutput_df):
+    """Method to split labels from the input dataset."""
 
     outputData = inputOutput_df["msf"].tolist()
     inputData = inputOutput_df.copy()
@@ -223,6 +242,9 @@ def splitLabels(inputOutput_df):
     return inputData, outputData
 
 def splitDataset(inputOutput_df):
+    """Method to split the dataset into train and test sets and their
+    respective outputs. The testsets contains one random day of each participant
+    if possible."""
 
     numberOfParticipants = int(inputOutput_df["Participant_ID"].max())
 
@@ -234,7 +256,7 @@ def splitDataset(inputOutput_df):
 
         participant = participant+1
 
-        # Get all all sleep moments of the current participant
+        # get all all data of current participant
         participantData = train_x.loc[(train_x.Participant_ID == participant)]
 
         if (len(participantData) > 1):
@@ -245,10 +267,11 @@ def splitDataset(inputOutput_df):
 
             train_x.drop(train_x.index[testDataIndex])
 
-
+    # extract and delete the output values
     train_y = train_x["msf"].tolist()
     train_x.drop('msf', axis=1, inplace=True)
-
+    
+    # extract and delete the output values
     test_y = test_x["msf"].tolist()
     test_x.drop('msf', axis=1, inplace=True)
 
@@ -256,6 +279,7 @@ def splitDataset(inputOutput_df):
 
 '''Helper method to calculate the msf values for the entire dataset.'''
 def createMSFMatrix():
+    """Matrix to compute all mid-sleep data. """
 
     # load already enhanced label-set (added day column)
     diary = pd.read_csv('dataset/modifiedLabels.csv')
@@ -263,21 +287,21 @@ def createMSFMatrix():
     numberOfParticipants = diary["Participant_ID"].max()
     numberOfDays = len(set(diary["day"].tolist()))
 
-    # create matrix containing the participants and their msf for each day
+    # create matrix containing the participants and their mid-sleep time for each day
     msfMatrix = np.zeros([numberOfParticipants, numberOfDays], dtype=float)
 
     for participant in range(numberOfParticipants):
 
         participant = participant+1
 
-        # Get all all sleep moments of the current participant
         participantSleepData = diary[(diary.Sleep == 1) & (diary.Participant_ID == participant)]
 
         for day in range((participantSleepData["day"].max())):
 
             day = day+1
             participantDayData = participantSleepData[participantSleepData.day == day]
-
+            
+            # sleep duration from diary data - every row corresponds to 15 minutes
             sleepDuration = len(participantDayData) * 15
             sleepOnset = participantDayData["Time"].iloc[0]
 
@@ -378,8 +402,6 @@ def createMSF_SCMatrix(middle=median_from_timedelta_tuplelist):
     msfMatrix = pd.DataFrame(msf_persist, index=index)
     return msfMatrix
 
-
-'''Method to join the input dataset and the msf-label.'''
 def joinOutputLabel(inputData):
     """
     Joins the input dataset with MSF(label) and MSFsc
