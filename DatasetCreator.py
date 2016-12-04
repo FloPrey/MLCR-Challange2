@@ -111,8 +111,7 @@ def extender(diary, label, expand):
                     mod[y] = 1
 
         diary[label] = mod
-        print("DEBUG: (Original, Mod, Changed)", label, ": ", (ref.count(1), mod.count(1), diary[label].tolist().count(1)))
-
+        
 '''Creates the complete Dataset containing all features, diary-labels and output label.'''
 def createDataSet():
 
@@ -322,7 +321,6 @@ def avg_from_timedelta_tuplelist(raw):
     sd = sum([z for (y, z) in raw], timedelta(0)) / len(raw)
 
     so = datetime.fromtimestamp(sum([y.timestamp() for (y, z) in raw]) / len(raw))
-    print(so)
     so = timedelta(hours=so.hour, minutes=so.minute)
     return sd, so
 
@@ -360,7 +358,6 @@ def createMSF_SCMatrix(middle=median_from_timedelta_tuplelist):
                 raw_work.append(tuple)
             else:
                 raw_free.append(tuple)
-        print([(str(x), str(y)) for (x, y) in raw_free])
         # avg calculation
         # calculate data for msfsc
         sd_f, so_f = middle(raw_free)
