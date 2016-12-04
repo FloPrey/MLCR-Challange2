@@ -33,3 +33,8 @@ The output of the programme will show :
   - with and without MSFsc feature
 
 --> Please make sure to close or save the diagrams to get the rest of the results to show.
+
+Nice to know:
+
+If you wish to print the 300 decision trees used in the ada Boost "forest", then you can add uncomment line 30 in the RegressionModels.py. This will create 300 files containing each of the decision tree in the location decisionTrees/ . The files need to be converted to png with the following bash command: for i in *;do dot -Tpng "$i" -o "$i"..png;done.
+
