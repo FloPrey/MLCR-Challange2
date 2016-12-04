@@ -85,6 +85,16 @@ def joinFeaturesAndDiary(feature_df, diary_df):
     return inputData
 
 def extender(diary, label, expand):
+    """
+    There are some columns in the dataset which describe feature, which may have a lasting impact.
+    This method tries to enhance the dataset to store the impact. This is achieved to set the columns after the event
+    to 1.
+    :param diary: the dataset to prepare
+    :param label: the columns to mod. May be list[str] or str
+    :param expand: The factor to expand. If 0, the dataset remains the same. If n, the n fields after the event are set
+    to true.
+    :return:
+    """
     if isinstance(label, list):
         for e in label:
             extender(diary, e, expand)
@@ -286,10 +296,10 @@ def createMSFMatrix():
 
 def median_from_timedelta_tuplelist(raw):
     """
-    Converts list of tuples (a,b) to 2 separate lists (list of a, list of b). Picks for each list the
-    median.
-    :param raw: list of tuples.
-    :return:
+    Calculates Average for MSFsc. Uses median as Average.
+    :type raw: list[(datetime, timedelta)]
+    :param raw: data for MSFsc
+    :return: (sd, so)
     """
     if len(raw) == 0:
         return timedelta(0), timedelta(0)
@@ -301,6 +311,12 @@ def median_from_timedelta_tuplelist(raw):
 
 
 def avg_from_timedelta_tuplelist(raw):
+    """
+    Calculates Average for MSFsc. Uses arithmetical middle as Average.
+    :type raw: list[(datetime, timedelta)]
+    :param raw: data for MSFsc
+    :return: (sd, so)
+    """
     if len(raw) == 0:
         return timedelta(0), timedelta(0)
     sd = sum([z for (y, z) in raw], timedelta(0)) / len(raw)
@@ -326,6 +342,7 @@ def createMSF_SCMatrix(middle=median_from_timedelta_tuplelist):
         participant = participant + 1
         # Get all all sleep moments of the current participant
         participantSleepData = diary[(diary.Sleep == 1) & (diary.Participant_ID == participant)]
+        # split data for work / free days
         raw_work = []
         raw_free = []
         for day in range((participantSleepData["day"].max())):
@@ -334,8 +351,8 @@ def createMSF_SCMatrix(middle=median_from_timedelta_tuplelist):
             participantDayData = participantSleepData[participantSleepData.day == day]
             sleepOnset = participantDayData["Time"].iloc[0]
             sleepOnset = datetime.strptime(sleepOnset, '%Y-%m-%d %H:%M:%S')
+            # normalize so for later average calculation
             sleepOnset = sleepOnset - timedelta(days=day)
-            # sleepOnset = timedelta(hours=sleepOnset.hour, minutes=sleepOnset.minute)
             sleepDuration = timedelta(minutes=(len(participantDayData) * 15))
             # onset, duration
             tuple = (sleepOnset, sleepDuration)
@@ -345,6 +362,7 @@ def createMSF_SCMatrix(middle=median_from_timedelta_tuplelist):
                 raw_free.append(tuple)
         print([(str(x), str(y)) for (x, y) in raw_free])
         # avg calculation
+        # calculate data for msfsc
         sd_f, so_f = middle(raw_free)
         sd_w, so_w = middle(raw_work)
         sd_week = (sd_f * len(raw_free) + sd_w * len(raw_work)) / (len(raw_free) + len(raw_work))
@@ -359,21 +377,28 @@ def createMSF_SCMatrix(middle=median_from_timedelta_tuplelist):
 
     index = msf_persist["Participant_ID"]
     del (msf_persist["Participant_ID"])
+    # msfsc for each participant
     msfMatrix = pd.DataFrame(msf_persist, index=index)
     return msfMatrix
 
 
 '''Method to join the input dataset and the msf-label.'''
 def joinOutputLabel(inputData):
+    """
+    Joins the input dataset with MSF(label) and MSFsc
+    :param inputData: the input dataset.
+    :return: the new dataset with msf and msfsc
+    """
     msfMatrix = createMSFMatrix()
     inputAndOutput_df = inputData.copy()
     msfColumn = list()
-
+    # add msf
     for i in range(0, len(inputData)):
         msfColumn.append(msfMatrix[int(inputData.iloc[i]['Participant_ID']) - 1][int(inputData.iloc[i]['day']) - 1])
 
     inputAndOutput_df['msf'] = msfColumn
-    msfsc = createMSF_SCMatrix(middle=median_from_timedelta_tuplelist) # rm middle-param to use arithmetic middle.
+    # add msfsc
+    msfsc = createMSF_SCMatrix(middle=median_from_timedelta_tuplelist)
     inputAndOutput_df = inputAndOutput_df.join(msfsc, on='Participant_ID')
     return inputAndOutput_df
 
