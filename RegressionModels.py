@@ -27,41 +27,47 @@ def trainCartModel(inputData, labels):
     print("CART - Regression Model trained with score: ")
     print (score)
 
-def trainWeightedLinearRegression(inputData, labels):
-    X_train, X_test, y_train, y_test = train_test_split(
-        inputData, labels, test_size=0.1, random_state=100)
+
+def trainWeightedLinearRegression(X_train, y_train, X_test, y_test):
+
+    del X_train['Participant_ID']
+    del X_test['Participant_ID']
+    del X_train['day']
+    del X_test['day']
+
     reg = linear_model.Ridge(alpha=0.5)
 
     reg.fit(X_train, y_train)
     predict = reg.predict(X_test)
     score = reg.score(X_test, y_test)
 
+    print("------------Test Results Weighted Linear Regression:------------------")
+    print("True Values:")
     print(y_test)
+    print("Predicted Values:")
     print(predict)
+    print("Reached Score(R²):")
     print(score)
-    plt.scatter(X_train[['best_mean']], y_train, color='black')
-    plt.plot(X_test[['best_mean']], predict, color='blue')
-    plt.xticks()
-    plt.yticks()
-    plt.show()
+    print("-------------End Result--------------------")
 
-def trainLinearRegression(inputData, labels):
-    X_train, X_test, y_train, y_test = train_test_split(
-        inputData, labels, test_size=0.1, random_state=100)
+
+def trainLinearRegression(X_train, y_train, X_test, y_test):
+
+
     reg = linear_model.LinearRegression()
 
     model = reg.fit(X_train, y_train)
     predict = reg.predict(X_test)
     score = reg.score(X_test, y_test)
 
+    print("------------Test Result Linear Regression:------------------")
+    print("True Values:")
     print(y_test)
+    print("Predicted Values:")
     print(predict)
+    print("Reached Score(R²):")
     print(score)
-    plt.scatter(X_train[['best_mean']], y_train, color='black')
-    plt.plot(X_test[['best_mean']], predict, color='blue')
-    plt.xticks()
-    plt.yticks()
-    plt.show()
+    print("-------------End Result--------------------")
 
 
 def trainAdaBoost(inputData, labels):
